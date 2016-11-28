@@ -1,25 +1,22 @@
-function img_out =  stitch( imageA, imageB, ratio, reprojThresh, showMatches )
+function stitch( dir )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
-[kpsA, featuresA] = detectAndDescribe(imageA);
-[kpsB, featuresB] = detectAndDescribe(imageB);
+photoDir = fullfile('C:\Users\agang\OneDrive\Documents\MATLAB\EECS-332\Final Project', dir);
+scene = imageDatastore(photoDir);
 
-[matches, H, status, check] = matchKeypoints(kpsA, kpsB, featuresA, featuresB, ratio, reprojThresh);
+montage(scene.Files);
+title('Images to be stitched');
 
-if check == false
-    error('Not enough matched keypoints to create a panorama');
-end
+% REGISTER IMAGE PAIRS
+tforms = registerImagePairs(scene);
 
-result = imwarp(imageA, H);
+% CREATE PANORAMA
+panorama = buildPanorama(scene, tforms);
 
-img_out = [result, imageB];
-
-if showMatches == true
-    vis = drawMatches(imageA, imageB, kpsA, kpsB, matches, status); 
-end
-
-return img_out;
+figure;
+imshow(panorama);
+title('Final Panorama');
 
 end
 
